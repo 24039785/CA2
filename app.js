@@ -74,9 +74,9 @@ const checkAdmin = (req, res, next) => {
 
 // Middleware for form validation
 const validateRegistration = (req, res, next) => {
-    const { _______, _______, _______, _______, _______, _______ } = req.body;
+    const { _______, _______, _______, _______, _______ } = req.body;
 
-    if (!_______ || !_______ || !_______ || !_______ || !_______ || !_______) {
+    if (!_______ || !_______ || !_______ || !_______ || !_______) {
         return res.status(400).send('All fields are required.');
     }
     

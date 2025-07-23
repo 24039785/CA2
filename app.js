@@ -69,15 +69,15 @@ const checkAdmin = (req, res, next) => {
         return next();
     } else {
         req.flash('error', 'Access denied');
-        res.redirect('/shopping');
+        res.redirect('_______');
     }
 };
 
 // Middleware for form validation
 const validateRegistration = (req, res, next) => {
-    const { username, email, password, address, contact, role } = req.body;
+    const { _______, _______, _______, _______, _______, _______ } = req.body;
 
-    if (!username || !email || !password || !address || !contact || !role) {
+    if (!_______ || !_______ || !_______ || !_______ || !_______ || !_______) {
         return res.status(400).send('All fields are required.');
     }
     

@@ -89,6 +89,20 @@ const validateRegistration = (req, res, next) => {
     next();
 };
 
+// Define routes
+app.get('/', (req, res) => {
+    const sql = 'SELECT * FROM bookings';
+    // Fetch data from MySQL
+    connection.query (sql, (error, results) => {
+        if (error) {
+            console.error('Database query error:', error.message);
+            return res.status(500).send('Error Retrieving The Bookings, It must be something wrong with the database we apologize for the inconvinience please check again later');
+        }
+        // Render HTML page with data
+        res.render('index', { bookings: results });
+    });
+});
+
 //******** TODO: Integrate validateRegistration into the register route. ********//
 app.post('/register', validateRegistration, (req, res) => {
     //******** TODO: Update register route to include role. ********//

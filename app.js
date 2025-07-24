@@ -159,3 +159,59 @@ app.get('/logout', (req,res) => {
 app.listen(3000, () => {
     console.log('Server started on port 3000');
 });
+
+
+
+// Middleware: Only allow hotel owners to update their own hotels
+const checkHotelOwner = (req, res, next) => {
+    const hotelId = req.params.id;
+    const userId = req.session.user.id;
+
+    const sql = 'SELECT * FROM hotels WHERE id = ? AND ownerId = ?';
+    connection.query(sql, [hotelId, userId], (err, results) => {
+        if (err) throw err;
+
+        if (results.length === 0) {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/dashboard');
+        }
+        next();
+    });
+};
+
+// Admin: Update hotel availability
+app.post('/admin/hotels/:id/availability', checkAuthenticated, checkAdmin, (req, res) => {
+    const hotelId = req.params.id;
+    const { availableRooms } = req.body;
+
+    const sql = 'UPDATE hotels SET availableRooms = ? WHERE id = ?';
+    connection.query(sql, [availableRooms, hotelId], (err, result) => {
+        if (err) throw err;
+
+        req.flash('success', 'Availability updated.');
+        res.redirect('/admin');
+    });
+});
+
+// Hotel user: Update own hotel info
+app.post('/hotels/:id/edit', checkAuthenticated, checkHotelOwner, upload.single('image'), (req, res) => {
+    const hotelId = req.params.id;
+    const { name, location, price, description } = req.body;
+    const image = req.file ? `/images/${req.file.filename}` : null;
+
+    let sql, values;
+    if (image) {
+        sql = 'UPDATE hotels SET name = ?, location = ?, price = ?, description = ?, image = ? WHERE id = ?';
+        values = [name, location, price, description, image, hotelId];
+    } else {
+        sql = 'UPDATE hotels SET name = ?, location = ?, price = ?, description = ? WHERE id = ?';
+        values = [name, location, price, description, hotelId];
+    }
+
+    connection.query(sql, values, (err, result) => {
+        if (err) throw err;
+
+        req.flash('success', 'Hotel information updated.');
+        res.redirect('/dashboard');
+    });
+});

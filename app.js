@@ -68,7 +68,7 @@ const checkAdmin = (req, res, next) => {
         return next();
     } else {
         req.flash('error', 'Access denied');
-        res.redirect('_______');
+        res.redirect('______');
     }
 };
 

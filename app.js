@@ -99,7 +99,7 @@ app.get('/', (req, res) => {
             return res.status(500).send('Error Retrieving The Bookings, It must be something wrong with the database we apologize for the inconvinience please check again later');
         }
         // Render HTML page with data
-        res.render('index', { bookings: results });
+        res.render('dex', { bookings: results });
     });
 });
 

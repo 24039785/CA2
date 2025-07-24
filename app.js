@@ -69,15 +69,15 @@ const checkAdmin = (req, res, next) => {
         return next();
     } else {
         req.flash('error', 'Access denied');
-        res.redirect('______');
+        res.redirect('/login');
     }
 };
 
 // Middleware for form validation
 const validateRegistration = (req, res, next) => {
-    const { _______, _______, _______, _______, _______ } = req.body;
+    const { id, username, email, password, address, contact, role } = req.body;
 
-    if (!_______ || !_______ || !_______ || !_______ || !_______) {
+    if (!id || !username || !email || !password || !address || !contact ||!role ) {
         return res.status(400).send('All fields are required.');
     }
     
@@ -94,8 +94,8 @@ app.post('/register', validateRegistration, (req, res) => {
     //******** TODO: Update register route to include role. ********//
     const { username, email, password, address, contact, role } = req.body;
 
-    const sql = 'INSERT INTO users (username, email, password, address, contact, role) VALUES (?, ?, SHA1(?), ?, ?, ?)';
-    db.query(sql, [username, email, password, address, contact, role], (err, result) => {
+    const sql = 'INSERT INTO users (id, username, email, password, address, contact, role) VALUES (?, ?, ?, SHA1(?), ?, ?, ?)';
+    db.query(sql, [id, username, email, password, address, contact, role], (err, result) => {
         if (err) {
             throw err;
         }
@@ -122,8 +122,8 @@ app.post('/login', (req, res) => {
         return res.redirect('/login');
     }
 
-    const sql = 'SELECT * FROM users WHERE _____ = ? AND password = SHA1(?)';
-    db.query(sql, [_______, password], (err, results) => {
+    const sql = 'SELECT * FROM users WHERE email = ? AND password = SHA1(?)';
+    db.query(sql, [email, password], (err, results) => {
         if (err) {
             throw err;
         }
@@ -140,8 +140,8 @@ app.post('/login', (req, res) => {
 });
 
 //******** TODO: Insert code for dashboard route to render dashboard page for users. ********//
-app.get('/dashboard', checkAuthenticated, (req, res) => {
-    res.render('dashboard', {user: req.session.user});
+app.get('/menu', checkAuthenticated, (req, res) => {
+    res.render('menu', {user: req.session.user});
 });
 
 //******** TODO: Insert code for admin route to render dashboard page for admin. ********//
@@ -154,6 +154,52 @@ app.get('/logout', (req,res) => {
     req.session.destroy();
     res.redirect('/');
 });
+
+//The Delete Route
+app.get('/delete', checkAuthenticated, checkAdmin, (req, res) => {
+    const sql = 'SELECT id, name FROM _____';
+
+    connection.query(sql, (err, results) => {
+        if (err) {
+            req.flash('error', 'Unable to fetch listing.');
+            return res.redirect('/admin');
+        }
+
+        res.render('delete', {
+            listings: results,
+            messages: req.flash('success'),
+            errors: req.flash('error')
+        });
+    });
+});
+
+app.post('/delete', checkAuthenticated, checkAdmin, (req, res) => {
+    const _____Id = req.body._______id;
+
+    if (!____Id) {
+        req.flash('error', 'Listing ID is required.');
+        return res.redirect('/delete');
+    }
+
+    const sql = 'DELETE FROM ________ WHERE id = ?';
+
+    connection.query(sql, [listingId], (err, result) => {
+        if (err) {
+            req.flash('error', 'Error deleting listing.');
+            return res.redirect('/delete');
+        }
+
+        if (result.affectedRows === 0) {
+            req.flash('error', 'No listing found with that ID.');
+        } else {
+            req.flash('success', 'Listing deleted successfully.');
+        }
+
+        res.redirect('/delete');
+    });
+});
+
+
 
 // Starting the server
 app.listen(3000, () => {

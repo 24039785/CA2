@@ -199,15 +199,6 @@ app.post('/delete', checkAuthenticated, checkAdmin, (req, res) => {
     });
 });
 
-
-
-// Starting the server
-app.listen(3000, () => {
-    console.log('Server started on port 3000');
-});
-
-
-
 // Middleware: Only allow hotel owners to update their own hotels
 const checkHotelOwner = (req, res, next) => {
     const hotelId = req.params.id;
@@ -260,4 +251,10 @@ app.post('/hotels/:id/edit', checkAuthenticated, checkHotelOwner, upload.single(
         req.flash('success', 'Hotel information updated.');
         res.redirect('/dashboard');
     });
+});
+
+
+// Starting the server
+app.listen(3000, () => {
+    console.log('Server started on port 3000');
 });

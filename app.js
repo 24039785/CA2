@@ -155,6 +155,7 @@ app.get('/logout', (req,res) => {
     res.redirect('/');
 });
 
+//The Delete Route
 app.get('/delete', checkAuthenticated, checkAdmin, (req, res) => {
     const sql = 'SELECT id, name FROM _____';
 

@@ -155,6 +155,51 @@ app.get('/logout', (req,res) => {
     res.redirect('/');
 });
 
+app.get('/delete', checkAuthenticated, checkAdmin, (req, res) => {
+    const sql = 'SELECT id, name FROM _____';
+
+    connection.query(sql, (err, results) => {
+        if (err) {
+            req.flash('error', 'Unable to fetch listing.');
+            return res.redirect('/admin');
+        }
+
+        res.render('delete', {
+            listings: results,
+            messages: req.flash('success'),
+            errors: req.flash('error')
+        });
+    });
+});
+
+app.post('/delete', checkAuthenticated, checkAdmin, (req, res) => {
+    const _____Id = req.body._______id;
+
+    if (!____Id) {
+        req.flash('error', 'Listing ID is required.');
+        return res.redirect('/delete');
+    }
+
+    const sql = 'DELETE FROM ________ WHERE id = ?';
+
+    connection.query(sql, [listingId], (err, result) => {
+        if (err) {
+            req.flash('error', 'Error deleting listing.');
+            return res.redirect('/delete');
+        }
+
+        if (result.affectedRows === 0) {
+            req.flash('error', 'No listing found with that ID.');
+        } else {
+            req.flash('success', 'Listing deleted successfully.');
+        }
+
+        res.redirect('/delete');
+    });
+});
+
+
+
 // Starting the server
 app.listen(3000, () => {
     console.log('Server started on port 3000');

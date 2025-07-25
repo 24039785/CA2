@@ -169,6 +169,38 @@ app.get('/logout', (req,res) => {
     res.redirect('/');
 });
 
+app.get('/add', checkAuthenticated, (req, res) => {
+    res.render('add', {
+        messages: req.flash('success'),
+        errors: req.flash('error')
+    });
+});
+
+app.post('/add', checkAuthenticated, upload.single('image'), (req, res) => {
+    const { name, location, price, description } = req.body;
+    const image = req.file ? `/images/${req.file.filename}` : null;
+    const ownerId = req.session.user.id;
+
+    if (!name || !location || !price || !description) {
+        req.flash('error', 'All fields are required.');
+        return res.redirect('/add');
+    }
+
+    const sql = 'INSERT INTO hotels (name, location, price, description, image, ownerId, availableRooms) VALUES (?, ?, ?, ?, ?, ?, ?)';
+    const values = [name, location, price, description, image, ownerId, 0]; // default 0 availableRooms
+
+    connection.query(sql, values, (err, result) => {
+        if (err) {
+            console.error('Error adding hotel:', err);
+            req.flash('error', 'Error adding hotel.');
+            return res.redirect('/add');
+        }
+
+        req.flash('success', 'Hotel added successfully!');
+        res.redirect('/dashboard');
+    });
+});
+
 //The Delete Route
 app.get('/delete', checkAuthenticated, checkAdmin, (req, res) => {
     const sql = 'SELECT id, name FROM _____';

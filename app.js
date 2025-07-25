@@ -196,8 +196,8 @@ app.post('/add', checkAuthenticated, upload.single('image'), (req, res) => {
             return res.redirect('/add');
         }
 
-        req.flash('success', 'Hotel added successfully!');
-        res.redirect('/dashboard');
+        req.flash('success', 'Hotel room added successfully!');
+        res.redirect('/');
     });
 });
 

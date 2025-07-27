@@ -63,26 +63,29 @@ const checkAuthenticated = (req, res, next) => {
     }
 };
 
-// Middleware to check if user is admin
 const checkAdmin = (req, res, next) => {
-    if (req.session.user.role === 'admin') {
+    if (req.session.user && req.session.user.role === 'admin') {
         return next();
     } else {
-        req.flash('error', 'Access denied');
+        req.flash('error', 'Access denied. Admins only.');
         res.redirect('/login');
     }
 };
 
 // Middleware for form validation
 const validateRegistration = (req, res, next) => {
-    const { id, username, email, password, address, contact, role } = req.body;
+    const { username, email, password, address, contact, role } = req.body;
 
-    if (!id || !username || !email || !password || !address || !contact ||!role ) {
-        return res.status(400).send('All fields are required.');
+    // Check required fields
+    if (!username || !email || !password || !address || !contact || !role) {
+        req.flash('error', 'All fields are required.');
+        req.flash('formData', req.body);
+        return res.redirect('/register');
     }
-    
+
+    // Check password length
     if (password.length < 6) {
-        req.flash('error', 'Password should be at least 6 or more characters long');
+        req.flash('error', 'Password must be at least 6 characters long.');
         req.flash('formData', req.body);
         return res.redirect('/register');
     }

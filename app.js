@@ -121,18 +121,19 @@ app.post('/register', validateRegistration, (req, res) => {
     });
 });
 
-//******** TODO: Insert code for login routes to render login page below ********//
-app.get('/login', (req,res) => {
+// Render Login Page
+app.get('/login', (req, res) => {
     res.render('login', {
-        messages: req.flash('success'),
-        errors: req.flash('error')
+        messages: req.flash('success'),  // Green success alerts
+        errors: req.flash('error')       // Red error alerts
     });
 });
 
-//******** TODO: Insert code for login routes for form submission below ********//
+// Handle Login Submission
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
 
+    // Check for empty fields
     if (!email || !password) {
         req.flash('error', 'All fields are required.');
         return res.redirect('/login');
@@ -141,19 +142,24 @@ app.post('/login', (req, res) => {
     const sql = 'SELECT * FROM users WHERE email = ? AND password = SHA1(?)';
     db.query(sql, [email, password], (err, results) => {
         if (err) {
-            throw err;
+            console.error('Database error during login:', err);
+            req.flash('error', 'An unexpected error occurred. Please try again.');
+            return res.redirect('/login');
         }
 
         if (results.length > 0) {
+            // User found, start a session
             req.session.user = results[0];
             req.flash('success', 'Login successful!');
-            res.redirect('/dashboard');
+            res.redirect('/dashboard'); // Adjust destination as needed
         } else {
+            // Invalid credentials
             req.flash('error', 'Invalid email or password.');
             res.redirect('/login');
         }
     });
 });
+
 
 //******** TODO: Insert code for dashboard route to render dashboard page for users. ********//
 app.get('/dex', checkAuthenticated, (req, res) => {

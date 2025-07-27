@@ -105,16 +105,18 @@ app.get('/', (req, res) => {
 
 //******** TODO: Integrate validateRegistration into the register route. ********//
 app.post('/register', validateRegistration, (req, res) => {
-    //******** TODO: Update register route to include role. ********//
     const { username, email, password, address, contact, role } = req.body;
+    const sql = `INSERT INTO users (username, email, password, address, contact, role) VALUES (?, ?, SHA1(?), ?, ?, ?)`;
 
-    const sql = 'INSERT INTO users (id, username, email, password, address, contact, role) VALUES (?, ?, ?, SHA1(?), ?, ?, ?)';
-    db.query(sql, [id, username, email, password, address, contact, role], (err, result) => {
+    db.query(sql, [username, email, password, address, contact, role], (err, result) => {
         if (err) {
-            throw err;
+            console.error('Registration error:', err);
+            req.flash('messages', ['Registration failed. Please try again.']);
+            return res.redirect('/register');
         }
-        console.log(result);
-        req.flash('success', 'Registration successful! Please log in.');
+
+        console.log('User registered:', result);
+        req.flash('messages', ['Registration successful! Please log in.']);
         res.redirect('/login');
     });
 });
@@ -154,13 +156,13 @@ app.post('/login', (req, res) => {
 });
 
 //******** TODO: Insert code for dashboard route to render dashboard page for users. ********//
-app.get('/menu', checkAuthenticated, (req, res) => {
-    res.render('menu', {user: req.session.user});
+app.get('/dex', checkAuthenticated, (req, res) => {
+    res.render('dex', {user: req.session.user});
 });
 
 //******** TODO: Insert code for admin route to render dashboard page for admin. ********//
 app.get('/admin', checkAuthenticated, checkAdmin, (req,res) => {
-    res.render('admin', {user: req.session.user });
+    res.render('admin', {user: req.session.user});
 });
 
 //******** TODO: Insert code for logout route ********//

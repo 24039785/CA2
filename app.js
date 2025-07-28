@@ -92,43 +92,76 @@ const validateRegistration = (req, res, next) => {
     next();
 };
 
-// Define routes
+// // Define routes
+// app.get('/', (req, res) => {
+//     const sql = 'SELECT * FROM bookings';
+//     // Fetch data from MySQL
+//     connection.query (sql, (error, results) => {
+//         if (error) {
+//             console.error('Database query error:', error.message);
+//             return res.status(500).send('Error Retrieving The Bookings, It must be something wrong with the database we apologize for the inconvinience please check again later');
+//         }
+//         // Render HTML page with data
+//         res.render('tempIndex', { bookings: results });
+//     });
+// });
+
+// //******** TODO: Insert code for dashboard route to render dashboard page for users. ********//
+// app.get('/tempIndex', checkAuthenticated, (req, res) => {
+//     res.render('tempIndex', {user: req.session.user});
+// });
+
+// //******** TODO: Insert code for admin route to render dashboard page for admin. ********//
+// app.get('/admin', checkAuthenticated, checkAdmin, (req,res) => {
+//     res.render('admin', {user: req.session.user});
+// });
+
+// Landing page
 app.get('/', (req, res) => {
-    const sql = 'SELECT * FROM bookings';
-    // Fetch data from MySQL
-    connection.query (sql, (error, results) => {
-        if (error) {
-            console.error('Database query error:', error.message);
-            return res.status(500).send('Error Retrieving The Bookings, It must be something wrong with the database we apologize for the inconvinience please check again later');
-        }
-        // Render HTML page with data
-        res.render('dex', { bookings: results });
-    });
+    res.render('landing'); // landing.ejs with "Login" and "Register" buttons
 });
 
-//******** TODO: Integrate validateRegistration into the register route. ********//
-app.post('/register', validateRegistration, (req, res) => {
-    const { username, email, password, address, contact, role } = req.body;
-    const sql = `INSERT INTO users (username, email, password, address, contact, role) VALUES (?, ?, SHA1(?), ?, ?, ?)`;
-
-    db.query(sql, [username, email, password, address, contact, role], (err, result) => {
-        if (err) {
-            console.error('Registration error:', err);
-            req.flash('messages', ['Registration failed. Please try again.']);
-            return res.redirect('/register');
-        }
-
-        console.log('User registered:', result);
-        req.flash('messages', ['Registration successful! Please log in.']);
-        res.redirect('/login');
-    });
-});
-
-// Render Login Page
+// Login page
 app.get('/login', (req, res) => {
     res.render('login', {
         messages: req.flash('success'),  // Green success alerts
         errors: req.flash('error')       // Red error alerts
+    });
+});
+
+// Register page
+app.get('/register', (req, res) => {
+    res.render('register', {
+        messages: req.flash('success'),  // Green success alerts
+        errors: req.flash('error'),      // Red error alerts
+        formData: {}                     
+    });
+});
+
+// handle register Submission
+app.post('/register', validateRegistration, (req, res) => {
+    const { username, email, password, address, contact, role } = req.body;
+
+    // Force role to "user" for security
+    const userRole = 'user';
+    const sql = `INSERT INTO users (username, email, password, address, contact, role) VALUES (?, ?, SHA1(?), ?, ?, ?)`;
+
+    connection.query(sql, [username, email, password, address, contact, userRole], (err, result) => {
+        if (err) {
+            console.error('Registration error:', err);
+
+            // Handle duplicate email error specifically
+            if (err.code === 'ER_DUP_ENTRY') {
+                req.flash('messages', ['Email is already registered. Please log in or use another email.']);
+            } else {
+                req.flash('messages', ['Registration failed. Please try again.']);
+            }
+            return res.redirect('/register');}
+
+        console.log('User registered:', result);
+
+        req.flash('messages', ['Registration successful! Please log in.']);
+        res.redirect('/login');
     });
 });
 
@@ -139,39 +172,59 @@ app.post('/login', (req, res) => {
     // Check for empty fields
     if (!email || !password) {
         req.flash('error', 'All fields are required.');
-        return res.redirect('/login');
-    }
+        return res.redirect('/login');}
 
     const sql = 'SELECT * FROM users WHERE email = ? AND password = SHA1(?)';
-    db.query(sql, [email, password], (err, results) => {
+    connection.query(sql, [email, password], (err, results) => {
         if (err) {
             console.error('Database error during login:', err);
             req.flash('error', 'An unexpected error occurred. Please try again.');
-            return res.redirect('/login');
-        }
+            return res.redirect('/login');}
 
         if (results.length > 0) {
             // User found, start a session
             req.session.user = results[0];
             req.flash('success', 'Login successful!');
-            res.redirect('/dashboard'); // Adjust destination as needed
+
+            // Redirect based on role
+            if (results[0].role === 'admin') {
+                res.redirect('/admin');
+            } else {
+                res.redirect('/dashboard');
+            }
         } else {
             // Invalid credentials
             req.flash('error', 'Invalid email or password.');
-            res.redirect('/login');
-        }
+            res.redirect('/login');}
     });
 });
 
-
-//******** TODO: Insert code for dashboard route to render dashboard page for users. ********//
-app.get('/dex', checkAuthenticated, (req, res) => {
-    res.render('dex', {user: req.session.user});
+app.get('/dashboard', checkAuthenticated, (req, res) => {
+    const sql = 'SELECT * FROM bookings';
+    connection.query(sql, (err, results) => {
+        if (err) {
+            console.error('Database query error:', err.message);
+            return res.status(500).send('Error retrieving bookings');
+        }
+        res.render('dashboard', { 
+            user: req.session.user,
+            bookings: results
+        });
+    });
 });
 
-//******** TODO: Insert code for admin route to render dashboard page for admin. ********//
-app.get('/admin', checkAuthenticated, checkAdmin, (req,res) => {
-    res.render('admin', {user: req.session.user});
+app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
+    const sql = 'SELECT * FROM bookings';
+    connection.query(sql, (err, results) => {
+        if (err) {
+            console.error('Database query error:', err.message);
+            return res.status(500).send('Error retrieving bookings');
+        }
+        res.render('admin', { 
+            user: req.session.user,
+            bookings: results
+        });
+    });
 });
 
 //******** TODO: Insert code for logout route ********//
@@ -180,135 +233,143 @@ app.get('/logout', (req,res) => {
     res.redirect('/');
 });
 
-app.get('/add', checkAuthenticated, (req, res) => {
-    res.render('add', {
-        messages: req.flash('success'),
-        errors: req.flash('error')
-    });
-});
 
-app.post('/add', checkAuthenticated, upload.single('image'), (req, res) => {
-    const { name, location, price, description } = req.body;
-    const image = req.file ? `/images/${req.file.filename}` : null;
-    const ownerId = req.session.user.id;
 
-    if (!name || !location || !price || !description) {
-        req.flash('error', 'All fields are required.');
-        return res.redirect('/add');
-    }
 
-    const sql = 'INSERT INTO hotels (name, location, price, description, image, ownerId, availableRooms) VALUES (?, ?, ?, ?, ?, ?, ?)';
-    const values = [name, location, price, description, image, ownerId, 0]; // default 0 availableRooms
 
-    connection.query(sql, values, (err, result) => {
-        if (err) {
-            console.error('Error adding hotel:', err);
-            req.flash('error', 'Error adding hotel.');
-            return res.redirect('/add');
-        }
 
-        req.flash('success', 'Hotel room added successfully!');
-        res.redirect('/');
-    });
-});
 
-//The Delete Route
-app.get('/delete', checkAuthenticated, checkAdmin, (req, res) => {
-    const sql = 'SELECT id, name FROM _____';
 
-    connection.query(sql, (err, results) => {
-        if (err) {
-            req.flash('error', 'Unable to fetch listing.');
-            return res.redirect('/admin');
-        }
 
-        res.render('delete', {
-            listings: results,
-            messages: req.flash('success'),
-            errors: req.flash('error')
-        });
-    });
-});
+// app.get('/add', checkAuthenticated, (req, res) => {
+//     res.render('add', {
+//         messages: req.flash('success'),
+//         errors: req.flash('error')
+//     });
+// });
 
-app.post('/delete', checkAuthenticated, checkAdmin, (req, res) => {
-    const _____Id = req.body._______id;
+// app.post('/add', checkAuthenticated, upload.single('image'), (req, res) => {
+//     const { name, location, price, description } = req.body;
+//     const image = req.file ? `/images/${req.file.filename}` : null;
+//     const ownerId = req.session.user.id;
 
-    if (!____Id) {
-        req.flash('error', 'Listing ID is required.');
-        return res.redirect('/delete');
-    }
+//     if (!name || !location || !price || !description) {
+//         req.flash('error', 'All fields are required.');
+//         return res.redirect('/add');
+//     }
 
-    const sql = 'DELETE FROM ________ WHERE id = ?';
+//     const sql = 'INSERT INTO hotels (name, location, price, description, image, ownerId, availableRooms) VALUES (?, ?, ?, ?, ?, ?, ?)';
+//     const values = [name, location, price, description, image, ownerId, 0]; // default 0 availableRooms
 
-    connection.query(sql, [listingId], (err, result) => {
-        if (err) {
-            req.flash('error', 'Error deleting listing.');
-            return res.redirect('/delete');
-        }
+//     connection.query(sql, values, (err, result) => {
+//         if (err) {
+//             console.error('Error adding hotel:', err);
+//             req.flash('error', 'Error adding hotel.');
+//             return res.redirect('/add');
+//         }
 
-        if (result.affectedRows === 0) {
-            req.flash('error', 'No listing found with that ID.');
-        } else {
-            req.flash('success', 'Listing deleted successfully.');
-        }
+//         req.flash('success', 'Hotel room added successfully!');
+//         res.redirect('/');
+//     });
+// });
 
-        res.redirect('/delete');
-    });
-});
+// //The Delete Route
+// app.get('/delete', checkAuthenticated, checkAdmin, (req, res) => {
+//     const sql = 'SELECT id, name FROM _____';
 
-// Middleware: Only allow hotel owners to update their own hotels
-const checkHotelOwner = (req, res, next) => {
-    const hotelId = req.params.id;
-    const userId = req.session.user.id;
+//     connection.query(sql, (err, results) => {
+//         if (err) {
+//             req.flash('error', 'Unable to fetch listing.');
+//             return res.redirect('/admin');
+//         }
 
-    const sql = 'SELECT * FROM hotels WHERE id = ? AND ownerId = ?';
-    connection.query(sql, [hotelId, userId], (err, results) => {
-        if (err) throw err;
+//         res.render('delete', {
+//             listings: results,
+//             messages: req.flash('success'),
+//             errors: req.flash('error')
+//         });
+//     });
+// });
 
-        if (results.length === 0) {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/dashboard');
-        }
-        next();
-    });
-};
+// app.post('/delete', checkAuthenticated, checkAdmin, (req, res) => {
+//     const _____Id = req.body._______id;
 
-// Admin: Update hotel availability
-app.post('/admin/hotels/:id/availability', checkAuthenticated, checkAdmin, (req, res) => {
-    const hotelId = req.params.id;
-    const { availableRooms } = req.body;
+//     if (!____Id) {
+//         req.flash('error', 'Listing ID is required.');
+//         return res.redirect('/delete');
+//     }
 
-    const sql = 'UPDATE hotels SET availableRooms = ? WHERE id = ?';
-    connection.query(sql, [availableRooms, hotelId], (err, result) => {
-        if (err) throw err;
+//     const sql = 'DELETE FROM ________ WHERE id = ?';
 
-        req.flash('success', 'Availability updated.');
-        res.redirect('/admin');
-    });
-});
+//     connection.query(sql, [listingId], (err, result) => {
+//         if (err) {
+//             req.flash('error', 'Error deleting listing.');
+//             return res.redirect('/delete');
+//         }
 
-// Hotel user: Update own hotel info
-app.post('/hotels/:id/edit', checkAuthenticated, checkHotelOwner, upload.single('image'), (req, res) => {
-    const hotelId = req.params.id;
-    const { name, location, price, description } = req.body;
-    const image = req.file ? `/images/${req.file.filename}` : null;
+//         if (result.affectedRows === 0) {
+//             req.flash('error', 'No listing found with that ID.');
+//         } else {
+//             req.flash('success', 'Listing deleted successfully.');
+//         }
 
-    let sql, values;
-    if (image) {
-        sql = 'UPDATE hotels SET name = ?, location = ?, price = ?, description = ?, image = ? WHERE id = ?';
-        values = [name, location, price, description, image, hotelId];
-    } else {
-        sql = 'UPDATE hotels SET name = ?, location = ?, price = ?, description = ? WHERE id = ?';
-        values = [name, location, price, description, hotelId];
-    }
+//         res.redirect('/delete');
+//     });
+// });
 
-    connection.query(sql, values, (err, result) => {
-        if (err) throw err;
+// // Middleware: Only allow hotel owners to update their own hotels
+// const checkHotelOwner = (req, res, next) => {
+//     const hotelId = req.params.id;
+//     const userId = req.session.user.id;
 
-        req.flash('success', 'Hotel information updated.');
-        res.redirect('/dashboard');
-    });
-});
+//     const sql = 'SELECT * FROM hotels WHERE id = ? AND ownerId = ?';
+//     connection.query(sql, [hotelId, userId], (err, results) => {
+//         if (err) throw err;
+
+//         if (results.length === 0) {
+//             req.flash('error', 'Access denied.');
+//             return res.redirect('/dashboard');
+//         }
+//         next();
+//     });
+// };
+
+// // Admin: Update hotel availability
+// app.post('/admin/hotels/:id/availability', checkAuthenticated, checkAdmin, (req, res) => {
+//     const hotelId = req.params.id;
+//     const { availableRooms } = req.body;
+
+//     const sql = 'UPDATE hotels SET availableRooms = ? WHERE id = ?';
+//     connection.query(sql, [availableRooms, hotelId], (err, result) => {
+//         if (err) throw err;
+
+//         req.flash('success', 'Availability updated.');
+//         res.redirect('/admin');
+//     });
+// });
+
+// // Hotel user: Update own hotel info
+// app.post('/hotels/:id/edit', checkAuthenticated, checkHotelOwner, upload.single('image'), (req, res) => {
+//     const hotelId = req.params.id;
+//     const { name, location, price, description } = req.body;
+//     const image = req.file ? `/images/${req.file.filename}` : null;
+
+//     let sql, values;
+//     if (image) {
+//         sql = 'UPDATE hotels SET name = ?, location = ?, price = ?, description = ?, image = ? WHERE id = ?';
+//         values = [name, location, price, description, image, hotelId];
+//     } else {
+//         sql = 'UPDATE hotels SET name = ?, location = ?, price = ?, description = ? WHERE id = ?';
+//         values = [name, location, price, description, hotelId];
+//     }
+
+//     connection.query(sql, values, (err, result) => {
+//         if (err) throw err;
+
+//         req.flash('success', 'Hotel information updated.');
+//         res.redirect('/dashboard');
+//     });
+// });
 
 
 // Starting the server

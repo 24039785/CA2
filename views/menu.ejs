@@ -1,87 +1,39 @@
 <!-- <!DOCTYPE html>
-<html>
-<head>
-  <title>Search your hotel</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      text-align: center;
-      margin-top: 100px;
-    }
-
-    h2 {
-      color: #333;
-    }
-
-    #searchInput {
-      padding: 10px;
-      width: 250px;
-      font-size: 16px;
-      border: 1px solid #aaa;
-      border-radius: 5px;
-    }
-
-    button {
-      padding: 10px 15px;
-      font-size: 16px;
-      background-color: #007BFF;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      margin-left: 5px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    #result {
-      margin-top: 20px;
-      font-size: 18px;
-      color: #444;
-    }
-  </style>
-</head>
-<body>
-
-  <h2>Search</h2>
-
-  <input type="text" id="searchInput" placeholder="Type something...">
-  <button onclick="checkInput()">Search</button>
-
-  <p id="result"></p>
-
-  <script>
-    function checkInput() {
-      var input = document.getElementById("searchInput").value;
-      var resultText = "";
-
-      if (input === hotelname) {
-        result = ;
-      }
-
-      if (input === "car") {
-        resultText = "You searched for: A car is a vehicle.";
-      }
-
-      if (input === "cat") {
-        resultText = "You searched for: A cat is an animal.";
-      }
-
-      if (input !== "apple" && input !== "car" && input !== "cat") {
-        resultText = "No result found.";
-      }
-
-      document.getElementById("result").innerText = resultText;
-    }
-  </script>
-
-</body>
+<html lang="en">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Navigation</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Link</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Dropdown
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="#">Action</a></li>
+            <li><a class="dropdown-item" href="#">Another action</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Something else here</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+        </li>
+      </ul>
+      <form class="d-flex">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+</nav>
 </html> -->
-<!-- 
-            <form method="GET" action="/search" class="mb-3">
-                <input type="text" name="keyword" placeholder="Search by username">
-                <button type="submit" class="btn btn-info btn-sm ml-2">Search</button>
-            </form> -->

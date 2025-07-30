@@ -256,12 +256,12 @@ app.get('/admin/search', checkAuthenticated, (req, res) => {
     const keyword = `%${req.query.keyword}%`;
     const sql = `SELECT * FROM bookings WHERE name LIKE ? LIMIT 1`;
 
-    db.query(sql, [keyword], (err, results) => {
+    connection.query(sql, [keyword], (err, results) => {
         if (err) throw err;
 
         if (results.length > 0) {
             const bookingId = results[0].bookingId;
-            res.redirect(`/amin`);
+            res.redirect(`/admin`);
         } else {
             res.send("Hotel not found");
         }
@@ -271,7 +271,7 @@ app.get('/admin/search', checkAuthenticated, (req, res) => {
 app.get('/hotels/:bookingId', (req, res) => {
     const hotelid = req.params.id;
 
-    db.query("SELECT * FROM bookings WHERE bookingId = ?", [hotelid], (err, results) => {
+    connection.query("SELECT * FROM bookings WHERE bookingId = ?", [hotelid], (err, results) => {
         if (err) throw err;
 
         if (results.length > 0) {

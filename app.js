@@ -237,24 +237,6 @@ app.get('/admin/delete/:id', (req, res) => {
     });
 });
 
-
-// //nash
-// //search hotels for admin
-// app.get('/AdminSearch', (req, res) => {
-//     const bookings = req.query.q;
-
-//     const sql = "SELECT * FROM bookings WHERE name LIKE ? LIMIT 1";
-//     connection.query(sql, [%${bookings}%], (err, results) => {
-//         if (err) throw err;
-
-//         if (results.length > 0) {
-//             res.redirect(/hotels/${results[0].id});
-//         } else {
-//             res.send("Hotel not found");
-//         }
-//     });
-// });
-
 app.get('/admin/search', checkAuthenticated, (req, res) => {
     const keyword = `%${req.query.keyword}%`;
     const sql = `SELECT * FROM bookings WHERE name LIKE ?`;

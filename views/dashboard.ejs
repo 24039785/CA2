@@ -36,48 +36,47 @@
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-  <div class="container-fluid">
-    <!-- Brand -->
-    <a class="navbar-brand gradient-text" href="#">Travelly</a>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container-fluid">
+      <!-- Brand -->
+      <a class="navbar-brand gradient-text" href="#">Travelly</a>
 
-    <!-- Toggle button for mobile -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
-            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" 
-            aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+      <!-- Toggle button for mobile -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-    <!-- Navbar content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <!-- Left nav links -->
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/dashboard">Homepage</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/add-booking">Book a Hotel</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/">Edit Profile</a>
-        </li>
-      </ul>
+      <!-- Navbar content -->
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/dashboard">Homepage</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/add-booking">Book a Hotel</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/">Edit Profile</a>
+          </li>
+        </ul>
 
-      <!-- Centered search bar -->
-      <form class="d-flex mx-auto" style="width: 40%;" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
+        <!-- Centered search bar -->
+        <form class="d-flex mx-auto" style="width: 40%;" role="search" method="GET" action="/dashboard">
+          <input class="form-control me-2" type="search" name="search" placeholder="Search by name or room type"
+            aria-label="Search" value="<%= typeof search !== 'undefined' ? search : '' %>" />
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
 
-      <!-- Right-aligned logout button -->
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="btn btn-secondary" href="/logout">Logout</a>
-        </li>
-      </ul>
+        <!-- Right-aligned logout button -->
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="btn btn-secondary" href="/logout">Logout</a>
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
   <div class="container mt-5">
     <h1 class="text-center mb-4">Available Bookings</h1>

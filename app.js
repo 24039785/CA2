@@ -96,30 +96,6 @@ const validateRegistration = (req, res, next) => {
   next();
 };
 
-// // Define routes
-// app.get('/', (req, res) => {
-//     const sql = 'SELECT * FROM bookings';
-//     // Fetch data from MySQL
-//     connection.query (sql, (error, results) => {
-//         if (error) {
-//             console.error('Database query error:', error.message);
-//             return res.status(500).send('Error Retrieving The Bookings, It must be something wrong with the database we apologize for the inconvinience please check again later');
-//         }
-//         // Render HTML page with data
-//         res.render('tempIndex', { bookings: results });
-//     });
-// });
-
-// //******** TODO: Insert code for dashboard route to render dashboard page for users. ********//
-// app.get('/tempIndex', checkAuthenticated, (req, res) => {
-//     res.render('tempIndex', {user: req.session.user});
-// });
-
-// //******** TODO: Insert code for admin route to render dashboard page for admin. ********//
-// app.get('/admin', checkAuthenticated, checkAdmin, (req,res) => {
-//     res.render('admin', {user: req.session.user});
-// });
-
 // Landing page
 app.get('/', (req, res) => {
   res.render('landing'); // landing.ejs with "Login" and "Register" buttons
@@ -208,8 +184,18 @@ app.post('/login', (req, res) => {
 });
 
 app.get('/dashboard', checkAuthenticated, (req, res) => {
-  const sql = 'SELECT * FROM bookings';
-  connection.query(sql, (err, results) => {
+  const search = req.query.search;
+
+  let sql = 'SELECT * FROM bookings';
+  let params = [];
+
+  if (search && search.trim() !== '') {
+    sql += ' WHERE name LIKE ? OR roomType LIKE ?';
+    const likeSearch = `%${search}%`;
+    params.push(likeSearch, likeSearch);
+  }
+
+  connection.query(sql, params, (err, results) => {
     if (err) {
       console.error('Database query error:', err.message);
       return res.status(500).send('Error retrieving bookings');
@@ -217,6 +203,7 @@ app.get('/dashboard', checkAuthenticated, (req, res) => {
     res.render('dashboard', {
       user: req.session.user,
       bookings: results,
+      search: search || ''
     });
   });
 });

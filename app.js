@@ -233,143 +233,63 @@ app.get('/logout', (req,res) => {
     res.redirect('/');
 });
 
+// King
+// Admin: View all users
+app.get('/admin/edit-users', checkAuthenticated, checkAdmin, (req, res) => {
+    const sql = 'SELECT * FROM users';
+    connection.query(sql, (err, users) => {
+        if (err) {
+            console.error('Error retrieving users:', err);
+            req.flash('error', 'Unable to fetch users.');
+            return res.redirect('/admin');
+        }
+        res.render('userList', { users, messages: req.flash('error') });
+    });
+});
+
+// Show edit form for a user
+app.get('/admin/edit-user/:id', checkAuthenticated, checkAdmin, (req, res) => {
+    const userId = req.params.id;
+    const sql = 'SELECT * FROM users WHERE id = ?';
+    connection.query(sql, [userId], (err, results) => {
+        if (err || results.length === 0) {
+            req.flash('error', 'User not found.');
+            return res.redirect('/admin/edit-users');
+        }
+        res.render('edit', { formData: results[0], messages: req.flash('error') });
+    });
+});
+
+
+// Handle edit form submission
+app.post('/edit/:id', checkAuthenticated, checkAdmin, (req, res) => {
+    const userId = req.params.id;
+    const { username, email, password, address, contact, role } = req.body;
+
+    let sql, values;
+
+    if (password) {
+        sql = `UPDATE users SET username = ?, email = ?, password = SHA1(?), address = ?, contact = ?, role = ? WHERE id = ?`;
+        values = [username, email, password, address, contact, role, userId];
+    } else {
+        sql = `UPDATE users SET username = ?, email = ?, address = ?, contact = ?, role = ? WHERE id = ?`;
+        values = [username, email, address, contact, role, userId];
+    }
+
+    connection.query(sql, values, (err, result) => {
+        if (err) {
+            console.error('Error updating user:', err);
+            req.flash('error', 'Failed to update user.');
+            return res.redirect('/admin/edit-user/' + userId);
+        }
+
+        req.flash('success', 'User updated successfully.');
+        res.redirect('/admin/edit-users');
+    });
+});
 
 
 
-
-
-
-
-
-// app.get('/add', checkAuthenticated, (req, res) => {
-//     res.render('add', {
-//         messages: req.flash('success'),
-//         errors: req.flash('error')
-//     });
-// });
-
-// app.post('/add', checkAuthenticated, upload.single('image'), (req, res) => {
-//     const { name, location, price, description } = req.body;
-//     const image = req.file ? `/images/${req.file.filename}` : null;
-//     const ownerId = req.session.user.id;
-
-//     if (!name || !location || !price || !description) {
-//         req.flash('error', 'All fields are required.');
-//         return res.redirect('/add');
-//     }
-
-//     const sql = 'INSERT INTO hotels (name, location, price, description, image, ownerId, availableRooms) VALUES (?, ?, ?, ?, ?, ?, ?)';
-//     const values = [name, location, price, description, image, ownerId, 0]; // default 0 availableRooms
-
-//     connection.query(sql, values, (err, result) => {
-//         if (err) {
-//             console.error('Error adding hotel:', err);
-//             req.flash('error', 'Error adding hotel.');
-//             return res.redirect('/add');
-//         }
-
-//         req.flash('success', 'Hotel room added successfully!');
-//         res.redirect('/');
-//     });
-// });
-
-// //The Delete Route
-// app.get('/delete', checkAuthenticated, checkAdmin, (req, res) => {
-//     const sql = 'SELECT id, name FROM _____';
-
-//     connection.query(sql, (err, results) => {
-//         if (err) {
-//             req.flash('error', 'Unable to fetch listing.');
-//             return res.redirect('/admin');
-//         }
-
-//         res.render('delete', {
-//             listings: results,
-//             messages: req.flash('success'),
-//             errors: req.flash('error')
-//         });
-//     });
-// });
-
-// app.post('/delete', checkAuthenticated, checkAdmin, (req, res) => {
-//     const _____Id = req.body._______id;
-
-//     if (!____Id) {
-//         req.flash('error', 'Listing ID is required.');
-//         return res.redirect('/delete');
-//     }
-
-//     const sql = 'DELETE FROM ________ WHERE id = ?';
-
-//     connection.query(sql, [listingId], (err, result) => {
-//         if (err) {
-//             req.flash('error', 'Error deleting listing.');
-//             return res.redirect('/delete');
-//         }
-
-//         if (result.affectedRows === 0) {
-//             req.flash('error', 'No listing found with that ID.');
-//         } else {
-//             req.flash('success', 'Listing deleted successfully.');
-//         }
-
-//         res.redirect('/delete');
-//     });
-// });
-
-// // Middleware: Only allow hotel owners to update their own hotels
-// const checkHotelOwner = (req, res, next) => {
-//     const hotelId = req.params.id;
-//     const userId = req.session.user.id;
-
-//     const sql = 'SELECT * FROM hotels WHERE id = ? AND ownerId = ?';
-//     connection.query(sql, [hotelId, userId], (err, results) => {
-//         if (err) throw err;
-
-//         if (results.length === 0) {
-//             req.flash('error', 'Access denied.');
-//             return res.redirect('/dashboard');
-//         }
-//         next();
-//     });
-// };
-
-// // Admin: Update hotel availability
-// app.post('/admin/hotels/:id/availability', checkAuthenticated, checkAdmin, (req, res) => {
-//     const hotelId = req.params.id;
-//     const { availableRooms } = req.body;
-
-//     const sql = 'UPDATE hotels SET availableRooms = ? WHERE id = ?';
-//     connection.query(sql, [availableRooms, hotelId], (err, result) => {
-//         if (err) throw err;
-
-//         req.flash('success', 'Availability updated.');
-//         res.redirect('/admin');
-//     });
-// });
-
-// // Hotel user: Update own hotel info
-// app.post('/hotels/:id/edit', checkAuthenticated, checkHotelOwner, upload.single('image'), (req, res) => {
-//     const hotelId = req.params.id;
-//     const { name, location, price, description } = req.body;
-//     const image = req.file ? `/images/${req.file.filename}` : null;
-
-//     let sql, values;
-//     if (image) {
-//         sql = 'UPDATE hotels SET name = ?, location = ?, price = ?, description = ?, image = ? WHERE id = ?';
-//         values = [name, location, price, description, image, hotelId];
-//     } else {
-//         sql = 'UPDATE hotels SET name = ?, location = ?, price = ?, description = ? WHERE id = ?';
-//         values = [name, location, price, description, hotelId];
-//     }
-
-//     connection.query(sql, values, (err, result) => {
-//         if (err) throw err;
-
-//         req.flash('success', 'Hotel information updated.');
-//         res.redirect('/dashboard');
-//     });
-// });
 
 
 // Starting the server

@@ -483,6 +483,57 @@ app.post('/admin/edit/:id', checkAuthenticated, checkAdmin, upload.single('image
   );
 });
 
+// User edits profile
+app.get('/edit-profile', checkAuthenticated, (req, res) => {
+  const userId = req.session.user.id;
+
+  const sql = 'SELECT * FROM users WHERE id = ?';
+  connection.query(sql, [userId], (err, results) => {
+    if (err || results.length === 0) {
+      req.flash('error', 'User not found.');
+      return res.redirect('/dashboard');
+    }
+
+    res.render('edit-profile', {
+      formData: results[0],
+      messages: req.flash('error'),
+      user: req.session.user
+    });
+  });
+});
+
+app.post('/edit-profile', checkAuthenticated, (req, res) => {
+  const userId = req.session.user.id;
+  const { username, email, password, address, contact } = req.body;
+
+  let sql, values;
+
+  if (password) {
+    sql = `UPDATE users SET username = ?, email = ?, password = SHA1(?), address = ?, contact = ? WHERE id = ?`;
+    values = [username, email, password, address, contact, userId];
+  } else {
+    sql = `UPDATE users SET username = ?, email = ?, address = ?, contact = ? WHERE id = ?`;
+    values = [username, email, address, contact, userId];
+  }
+
+  connection.query(sql, values, (err) => {
+    if (err) {
+      console.error('Update error:', err);
+      req.flash('error', 'Failed to update profile.');
+      return res.redirect('/edit-profile');
+    }
+
+    // Update session info (optional but recommended)
+    req.session.user.username = username;
+    req.session.user.email = email;
+
+    req.flash('success', 'Profile updated successfully!');
+    res.redirect('/dashboard');
+  });
+});
+
+
+
 
 // Starting the server
 app.listen(3000, () => {

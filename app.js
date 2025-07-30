@@ -453,10 +453,15 @@ app.get('/admin/edit/:id', checkAuthenticated, checkAdmin, (req, res) => {
 });
 
 // Handle hotel edit form submission
-app.post('/admin/edit/:id', checkAuthenticated, checkAdmin, (req, res) => {
+app.post('/admin/edit/:id', checkAuthenticated, checkAdmin, upload.single('image'), (req, res) => {
   const bookingId = req.params.id;
-  const { name, location, roomType, image, isAvailable } = req.body;
+  const { name, location, roomType, isAvailable, existingImage } = req.body;
   const availability = isAvailable ? 1 : 0;
+
+  let imagePath = existingImage; // default to old image
+  if (req.file) {
+    imagePath = '/images/' + req.file.filename;
+  }
 
   const sql = `UPDATE bookings 
                  SET name = ?, location = ?, roomType = ?, image = ?, isAvailable = ? 
@@ -464,7 +469,7 @@ app.post('/admin/edit/:id', checkAuthenticated, checkAdmin, (req, res) => {
 
   connection.query(
     sql,
-    [name, location, roomType, image, availability, bookingId],
+    [name, location, roomType, imagePath, availability, bookingId],
     (err, result) => {
       if (err) {
         console.error('Error updating hotel:', err);
@@ -477,6 +482,7 @@ app.post('/admin/edit/:id', checkAuthenticated, checkAdmin, (req, res) => {
     }
   );
 });
+
 
 // Starting the server
 app.listen(3000, () => {

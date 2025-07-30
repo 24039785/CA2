@@ -235,6 +235,22 @@ app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
   });
 });
 
+// DELETE hotel booking by ID
+app.get('/admin/delete/:id', (req, res) => {
+    const bookingId = req.params.id;
+
+    const sql = 'DELETE FROM bookings WHERE bookingId = ?';
+    connection.query(sql, [bookingId], (err, result) => {
+        if (err) {
+            console.error('Error deleting booking:', err);
+            return res.status(500).send('Database error');
+        }
+        console.log(`Booking with ID ${bookingId} deleted successfully.`);
+        res.redirect('/admin'); // reloads the admin page
+    });
+});
+
+
 // //nash
 // //search hotels for admin
 // app.get('/AdminSearch', (req, res) => {

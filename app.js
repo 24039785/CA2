@@ -252,46 +252,33 @@ app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
 //     });
 // });
 
-app.get('/AdminSearch/search', checkAuthenticated, (req, res) => {
+app.get('/admin/search', checkAuthenticated, (req, res) => {
     const keyword = `%${req.query.keyword}%`;
-    const sql = `SELECT * FROM bookings WHERE name LIKE ?`;
+    const sql = `SELECT * FROM bookings WHERE name LIKE ? LIMIT 1`;
 
     db.query(sql, [keyword], (err, results) => {
         if (err) throw err;
 
-        res.render('admin/index', {
-            bookings: results,
-            users: req.session.users
-        });
-    });
-});
-
-
-
-app.get('/hotels/:id', (req, res) => {
-    const hotelid = req.params.id;
-
-    db.query("SELECT * FROM bookings WHERE bookingId = ?", [hotelid], (err, results) => {
-        if (err) throw err;
-
         if (results.length > 0) {
-            res.render('bookings', { bookings: results[0] });
+            const bookingId = results[0].bookingId;
+            res.redirect(`/amin`);
         } else {
             res.send("Hotel not found");
         }
     });
 });
 
-app.post('/hotels', (req, res) => {
-    const search = req.body.q;
+app.get('/hotels/:bookingId', (req, res) => {
+    const hotelid = req.params.id;
 
-    const sql = "SELECT * FROM bookings WHERE name LIKE ? LIMIT 1";
-    connection.query(sql, `%${search}%`, (err, results) => {
+    db.query("SELECT * FROM bookings WHERE bookingId = ?", [hotelid], (err, results) => {
         if (err) throw err;
 
         if (results.length > 0) {
-            // Redirect to hotel page
-            res.redirect('/admin');
+            res.render('hotel', {
+                bookings: results[0],
+                users: req.session.users
+            });
         } else {
             res.send("Hotel not found");
         }

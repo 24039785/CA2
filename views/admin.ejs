@@ -25,8 +25,18 @@
             <a class="nav-link" href="/AdminSearch">Search Hotel</a>
           </li>
         </ul>
-        <!-- Logout Button -->
-        <a href="/logout" class="btn btn-secondary">Logout</a>
+        <!-- Centered search bar -->
+        <form class="d-flex mx-auto" style="width: 40%;" role="search">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+
+        <!-- Right-aligned logout button -->
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="btn btn-secondary" href="/logout">Logout</a>
+          </li>
+        </ul>
       </div>
     </div>
   </nav>

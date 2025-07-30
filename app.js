@@ -250,6 +250,96 @@ app.get('/logout', (req,res) => {
     res.redirect('/');
 });
 
+// Route to render the Add Hotel form
+// Show add hotel form (only admin)
+app.get('/add', checkAuthenticated, checkAdmin, (req, res) => {
+    res.render('add', {
+        messages: req.flash('error'),
+        formData: {},
+        user: req.session.user  // Pass user to the view
+    });
+});
+
+// Handle add hotel form submission
+app.post('/add', checkAuthenticated, checkAdmin, upload.single('image'), (req, res) => {
+    const { name, location, roomType, isAvailable } = req.body;
+    let image = '';
+
+    if (req.file) {
+        image = '/images/' + req.file.filename;
+    }
+
+    // Validate required fields
+    if (!name || !location || !roomType) {
+        req.flash('error', 'Please fill in all required fields.');
+        return res.render('add', {
+            messages: req.flash('error'),
+            formData: req.body,
+            user: req.session.user  // Pass user here too
+        });
+    }
+
+    const available = isAvailable === 'on' ? 1 : 0;
+
+    const sql = `INSERT INTO bookings (name, location, roomType, isAvailable, image) VALUES (?, ?, ?, ?, ?)`;
+
+    connection.query(sql, [name, location, roomType, available, image], (err, result) => {
+        if (err) {
+            console.error('Error adding hotel:', err);
+            req.flash('error', 'Failed to add hotel. Please try again.');
+            return res.render('add', {
+                messages: req.flash('error'),
+                formData: req.body,
+                user: req.session.user
+            });
+        }
+
+        req.flash('success', 'Hotel added successfully!');
+        res.redirect('/admin');
+    });
+});
+
+// GET: Show booking form (user books hotel)
+app.get('/add-booking', checkAuthenticated, (req, res) => {
+    const sql = 'SELECT * FROM bookings WHERE isAvailable = 1';
+    connection.query(sql, (err, results) => {
+        if (err) {
+            console.error('Error fetching hotels:', err);
+            req.flash('error', 'Unable to load available hotels.');
+            return res.redirect('/dashboard');
+        }
+        res.render('add-booking', {
+            user: req.session.user,
+            hotels: results,
+            messages: req.flash('error')
+        });
+    });
+});
+
+// POST: Handle booking submission
+app.post('/add-booking', checkAuthenticated, (req, res) => {
+    const { bookingId, checkIn, checkOut } = req.body;
+    const userId = req.session.user.id;
+
+    if (!bookingId || !checkIn || !checkOut) {
+        req.flash('error', 'All fields are required.');
+        return res.redirect('/add-booking');
+    }
+
+    const sql = `INSERT INTO user_bookings (userId, bookingId, checkIn, checkOut) VALUES (?, ?, ?, ?)`;
+
+    connection.query(sql, [userId, bookingId, checkIn, checkOut], (err, result) => {
+        if (err) {
+            console.error('Booking error:', err);
+            req.flash('error', 'Failed to book. Please try again.');
+            return res.redirect('/add-booking');
+        }
+
+        req.flash('success', 'Booking successful!');
+        res.redirect('/dashboard');
+    });
+});
+
 // King
 // Admin: View all users
 app.get('/admin/edit-users', checkAuthenticated, checkAdmin, (req, res) => {

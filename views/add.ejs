@@ -8,30 +8,32 @@
         <title>Hotel rooms booking</title>
     </head>
 <body>
-    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="/">Hotel dot com</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="collapsibleNavbar">
-          <ul class="navbar-nav">
-            <% if (!user) {%>
-                <li class="nav-item">
-                    <a class="nav-link" href="/register">Register</a>
-                </li> 
-                <li class="nav-item">
-                    <a class="nav-link" href="/login">Login</a>
-                </li> 
-            <% } else { %>
-                <li class="nav-item">
-                    <a class="nav-link" href="/logout">Logout</a>
-                </li> 
-            <% } %>
-          </ul>
-        </div>
-      </div>
-    </nav>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Navigation</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/admin">Hotels Available</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/add">Add Hotel</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/edit-users">Edit User</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/AdminSearch.ejs">Search Hotel</a>
+        </li>
+      </ul>
+      <!-- Logout Button -->
+      <a href="/logout" class="btn btn-danger">Logout</a>
+    </div>
+  </div>
+</nav>
 
     <div class="container">
         <br>

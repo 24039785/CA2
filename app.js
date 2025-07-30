@@ -254,33 +254,35 @@ app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
 
 app.get('/admin/search', checkAuthenticated, (req, res) => {
     const keyword = `%${req.query.keyword}%`;
-    const sql = `SELECT * FROM bookings WHERE name LIKE ? LIMIT 1`;
+    const sql = `SELECT * FROM bookings WHERE name LIKE ?`;
 
     connection.query(sql, [keyword], (err, results) => {
         if (err) throw err;
 
-        if (results.length > 0) {
-            const bookingId = results[0].bookingId;
-            res.redirect(`/admin`);
-        } else {
-            res.send("Hotel not found");
-        }
+        res.render('admin', {
+            bookings: results,
+            users: req.session.users
+        });
     });
 });
 
-app.get('/hotels/:bookingId', (req, res) => {
-    const hotelid = req.params.id;
 
-    connection.query("SELECT * FROM bookings WHERE bookingId = ?", [hotelid], (err, results) => {
-        if (err) throw err;
+app.get('/hotels/:id', (req, res) => {
+    const hotelId = req.params.id;
+
+    connection.query('SELECT * FROM bookings WHERE bookingId = ?', [hotelId], (err, results) => {
+        if (err) {
+            console.error('Detail error:', err.message);
+            return res.status(500).send("Database error");
+        }
 
         if (results.length > 0) {
-            res.render('hotel', {
-                bookings: results[0],
-                users: req.session.users
+            res.render('admin', {
+                hotels: results, 
+                users: req.session.users 
             });
         } else {
-            res.send("Hotel not found");
+            res.send('Hotel not found');
         }
     });
 });

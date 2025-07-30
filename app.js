@@ -227,11 +227,11 @@ app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
     });
 });
 
-// //search hotels for admin
-// app.get('/AdminSearch', checkAuthenticated,(req, res) => {
-//     const keyword = `%${req.query.keyword}%`;
-//     const sql = `SELECT * FROM bookings`
-// })
+//search hotels for admin
+app.get('/AdminSearch', checkAuthenticated,(req, res) => {
+    const keyword = `%${req.query.keyword}%`;
+    const sql = `SELECT * FROM bookings`
+})
 
 //******** TODO: Insert code for logout route ********//
 app.get('/logout', (req,res) => {

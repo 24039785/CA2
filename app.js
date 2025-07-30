@@ -332,44 +332,50 @@ app.post('/add', checkAuthenticated, checkAdmin, upload.single('image'), (req, r
 
 // GET: Show booking form (user books hotel)
 app.get('/add-booking', checkAuthenticated, (req, res) => {
-    const sql = 'SELECT * FROM bookings WHERE isAvailable = 1';
-    connection.query(sql, (err, results) => {
-        if (err) {
-            console.error('Error fetching hotels:', err);
-            req.flash('error', 'Unable to load available hotels.');
-            return res.redirect('/dashboard');
-        }
-        res.render('add-booking', {
-            user: req.session.user,
-            hotels: results,
-            messages: req.flash('error'),
+    const bookingId = req.query.bookingId;
+
+    if (!bookingId) {
+        // Show all available hotels if no specific one selected
+        const bookingQuery = 'SELECT * FROM bookings WHERE isAvailable = 1';
+        connection.query(bookingQuery, (err, bookings) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Error loading bookings');
+            }
+            res.render('add-booking', { bookings, selectedHotel: null });
         });
-    });
+    } else {
+        // Fetch selected hotel only
+        const singleBookingQuery = 'SELECT * FROM bookings WHERE bookingId = ? AND isAvailable = 1';
+        connection.query(singleBookingQuery, [bookingId], (err, results) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Error loading booking');
+            }
+            if (results.length === 0) {
+                return res.status(404).send('Hotel not found or not available');
+            }
+            res.render('add-booking', { bookings: null, selectedHotel: results[0] });
+        });
+    }
 });
 
-// POST: Handle booking submission
 app.post('/add-booking', checkAuthenticated, (req, res) => {
-    const { bookingId, checkIn, checkOut } = req.body;
+    const bookingId = req.body.bookingId;
     const userId = req.session.user.id;
 
-    if (!bookingId || !checkIn || !checkOut) {
-        req.flash('error', 'All fields are required.');
-        return res.redirect('/add-booking');
-    }
+    const updateQuery = 'UPDATE users SET hotelId = ? WHERE id = ?';
 
-    const sql = `INSERT INTO user_bookings (userId, bookingId, checkIn, checkOut) VALUES (?, ?, ?, ?)`;
-
-    connection.query(sql, [userId, bookingId, checkIn, checkOut], (err, result) => {
+    connection.query(updateQuery, [bookingId, userId], (err, result) => {
         if (err) {
-            console.error('Booking error:', err);
-            req.flash('error', 'Failed to book. Please try again.');
-            return res.redirect('/add-booking');
+            console.error('Error updating user booking:', err);
+            return res.status(500).send('Failed to book hotel.');
         }
 
-        req.flash('success', 'Booking successful!');
-        res.redirect('/dashboard');
+        res.redirect('/dashboard'); 
     });
 });
+
 
 // King
 // Admin: View all users

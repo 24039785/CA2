@@ -102,6 +102,12 @@
                 <p class="availability text-<%= booking.isAvailable ? 'success' : 'danger' %>">
                   <%= booking.isAvailable ? 'Available' : 'Not Available' %>
                 </p>
+
+                <% if (booking.isAvailable) { %>
+                  <a href="/add-booking?bookingId=<%= booking.bookingId %>" class="btn btn-primary">Book</a>
+                <% } else { %>
+                  <button class="btn btn-secondary" disabled>Not Available</button>
+                <% } %>
               </div>
             </div>
           </div>

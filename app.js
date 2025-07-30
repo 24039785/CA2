@@ -227,11 +227,22 @@ app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
     });
 });
 
+//nash
 //search hotels for admin
 app.get('/AdminSearch', checkAuthenticated,(req, res) => {
     const keyword = `%${req.query.keyword}%`;
-    const sql = `SELECT * FROM bookings`
-})
+    const sql = `SELECT * FROM bookings WHERE name SORT asc desc`
+    connection.query(sql, (err, results) => {
+        if (err) {
+            console.error('Database query error:', err.message);
+            return res.status(500).send('Error retrieving search engine');
+        }
+        res.render('AdminSearch', { 
+            user: req.session.user,
+            bookings: results
+        });
+    });
+});
 
 //******** TODO: Insert code for logout route ********//
 app.get('/logout', (req,res) => {

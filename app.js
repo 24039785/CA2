@@ -305,8 +305,43 @@ app.post('/edit/:id', checkAuthenticated, checkAdmin, (req, res) => {
     });
 });
 
+// Edit Hotel
+// Render edit hotel form
+app.get('/admin/edit/:id', checkAuthenticated, checkAdmin, (req, res) => {
+    const bookingId = req.params.id;
+    const sql = 'SELECT * FROM bookings WHERE bookingId = ?';
 
+    connection.query(sql, [bookingId], (err, results) => {
+        if (err || results.length === 0) {
+            console.error('Error retrieving hotel:', err);
+            req.flash('error', 'Hotel not found.');
+            return res.redirect('/admin');
+        }
+        res.render('edit-hotel', { booking: results[0] });
+    });
+});
 
+// Handle hotel edit form submission
+app.post('/admin/edit/:id', checkAuthenticated, checkAdmin, (req, res) => {
+    const bookingId = req.params.id;
+    const { name, location, roomType, image, isAvailable } = req.body;
+    const availability = isAvailable ? 1 : 0;
+
+    const sql = `UPDATE bookings 
+                 SET name = ?, location = ?, roomType = ?, image = ?, isAvailable = ? 
+                 WHERE bookingId = ?`;
+
+    connection.query(sql, [name, location, roomType, image, availability, bookingId], (err, result) => {
+        if (err) {
+            console.error('Error updating hotel:', err);
+            req.flash('error', 'Failed to update hotel.');
+            return res.redirect('/admin/edit/' + bookingId);
+        }
+
+        req.flash('success', 'Hotel updated successfully.');
+        res.redirect('/admin');
+    });
+});
 
 
 // Starting the server

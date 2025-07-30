@@ -229,19 +229,36 @@ app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
 
 //nash
 //search hotels for admin
-app.get('/AdminSearch', checkAuthenticated,(req, res) => {
-    const keyword = `%${req.query.keyword}%`;
-    const sql = `SELECT * FROM bookings WHERE name SORT asc desc`
-    connection.query(sql, (err, results) => {
-        if (err) {
-            console.error('Database query error:', err.message);
-            return res.status(500).send('Error retrieving search engine');
-        }
-        res.render('AdminSearch', { 
-            user: req.session.user,
-            bookings: results
-        });
-    });
+app.get('/AdminSearch', (req, res) => {
+    const name = req.query.name;
+    const roomType = req.query.roomType;
+
+    let sql = 'SELECT * FROM bookings WHERE 1';
+    const values = [];
+
+    if (name) {
+        sql += ' AND name LIKE ?';
+        values.push('%' + name + '%');
+    }
+
+    if (roomType) {
+        sql += ' AND roomType = ?';
+        values.push(roomType);
+    }
+
+    connection.query(sql, values, (err, results) => {
+        if (err) {
+            console.error('Database query error:', err.message);
+            return res.status(500).send('Error searching for hotels');
+        }
+
+        // Send results to your search results page
+        res.render('AdminSearch', { 
+            bookings: results, 
+            search: name, 
+            roomType: roomType
+        });
+    });
 });
 
 //******** TODO: Insert code for logout route ********//

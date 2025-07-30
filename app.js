@@ -244,6 +244,20 @@ app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
 //     });
 // });
 
+app.get('/AdminSearch/search', checkAuthentication, (req, res) => {
+    const keyword = `%${req.query.keyword}%`;
+    const sql = `
+        SELECT * FROM (bookings) 
+        WHERE name LIKE ?`;
+
+    db.query(sql, [keyword, keyword, keyword], (err, results) => {
+        if (err) throw err;
+        res.render('AdminSearch/index', {
+            bookings: results,
+            user: req.session.user
+        });
+    });
+});
 //******** TODO: Insert code for logout route ********//
 app.get('/logout', (req,res) => {
     req.session.destroy();

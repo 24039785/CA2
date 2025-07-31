@@ -386,22 +386,22 @@ app.post('/add-booking', checkAuthenticated, (req, res) => {
 
         res.redirect('/dashboard');
     });
+});
 
-
-    // King
-    // Admin: View all users
-    app.get('/admin/edit-users', checkAuthenticated, checkAdmin, (req, res) => {
-        const sql = 'SELECT * FROM users';
-        connection.query(sql, (err, users) => {
-            if (err) {
-                console.error('Error retrieving users:', err);
-                req.flash('error', 'Unable to fetch users.');
-                return res.redirect('/admin');
-            }
-            res.render('userList', { users, messages: req.flash('error') });
-        });
+// King
+// Admin: View all users
+app.get('/admin/edit-users', checkAuthenticated, checkAdmin, (req, res) => {
+    const sql = 'SELECT * FROM users';
+    connection.query(sql, (err, users) => {
+        if (err) {
+            console.error('Error retrieving users:', err);
+            req.flash('error', 'Unable to fetch users.');
+            return res.redirect('/admin');
+        }
+        res.render('userList', { users, messages: req.flash('error') });
     });
 });
+
 
 // Show edit form for a user
 app.get('/admin/edit-user/:id', checkAuthenticated, checkAdmin, (req, res) => {

@@ -275,6 +275,7 @@ app.get('/hotels/:id', (req, res) => {
 });
 
 //^^nash^^
+
 //******** TODO: Insert code for logout route ********//
 app.get('/logout', (req, res) => {
     req.session.destroy();

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flare Air</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 40px;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      a {
+        color: #007bff;
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      p {
+        font-size: 18px;
+        margin-top: 10px;
+      }
+
+      .welcome {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="welcome">
+        <% if (user) { %> <% if (user.role === "admin") { %>
+        <p>Back to <a href="/location">inventory</a>!</p>
+        <% } else { %>
+        <p>Continue <a href="/booking">booking</a>!</p>
+        <% } %> <% } else { %>
+        <p>
+          Welcome to Flare Air!<br />
+          Please <a href="/login">login</a> to continue...
+        </p>
+        <% } %>
+      </div>
+    </div>
+  </body>
+</html>

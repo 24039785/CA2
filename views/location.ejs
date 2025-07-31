@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flare Air</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 40px;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      h2 {
+        margin-bottom: 20px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        border: 1px solid #ccc;
+        text-align: center;
+      }
+
+      th {
+        background-color: #f0f0f0;
+      }
+
+      a {
+        text-decoration: none;
+        color: #007bff;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      img {
+        max-width: 80px;
+      }
+
+      .text-center {
+        text-align: center;
+      }
+
+      .add-button {
+        display: inline-block;
+        margin: 20px 0;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+      }
+
+      .add-button:hover {
+        background-color: #0056b3;
+      }
+
+      p {
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <p>Welcome, <%= user.username %> (<%= user.role %>)</p>
+
+      <% if (user && user.role === 'admin') { %>
+      <div class="text-center">
+        <a href="/addlocation" class="add-button">+ Add New Location</a>
+      </div>
+      <% } %>
+
+      <div class="text-center"><h2>Locations</h2></div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Location</th>
+            <th>Image</th>
+            <th>Edit</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for(let i = 0; i < bookings.length; i++) { %>
+          <tr>
+            <td>
+              <a href="/location/<%= bookings[i].bookingid %>">
+                <%= bookings[i].location %>
+              </a>
+            </td>
+            <td>
+              <img
+                src="images/<%= bookings[i].image %>"
+                alt="<%= bookings[i].location %>"
+              />
+            </td>
+            <td>
+              <a href="/updatelocation/<%= bookings[i].bookingid %>">Edit</a>
+            </td>
+            <td>
+              <a
+                href="/deletebooking/<%= bookings[i].bookingid %>"
+                onclick="return confirm('Are you sure you want to remove the location?')"
+                >Delete</a
+              >
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,35 @@
+<% if (location) { %>
+<form
+  action="/updatelocation/<%= location.bookingid %>"
+  method="POST"
+  enctype="multipart/form-data"
+>
+  <label for="location">Location</label>
+  <input
+    type="text"
+    id="location"
+    name="location"
+    value="<%= location.location %>"
+    required
+  />
+
+  <label>Current Image</label>
+  <input
+    type="text"
+    name="currentImage"
+    value="<%= location.image %>"
+    readonly
+  />
+  <img src="/images/<%= location.image %>" alt="Current location image" />
+
+  <label for="image">Upload New Image</label>
+  <input type="file" id="image" name="image" accept="image/*" />
+
+  <div class="button-group">
+    <button type="submit">Update Location</button>
+    <a href="/location" class="back-button">Back to Locations</a>
+  </div>
+</form>
+<% } else { %>
+<p class="text-center">No Such Location.</p>
+<% } %>

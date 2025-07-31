@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
   <meta charset="UTF-8" />
   <title>Book a Hotel</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
@@ -18,158 +16,85 @@
       background: #343a40;
       border: none;
     }
+
     body {
       background-color: #f8f9fa;
     }
+
     .container-flex {
       display: flex;
       max-width: 900px;
       margin: 50px auto;
       border-radius: 8px;
       overflow: hidden;
-      height: 500px; /* fixed height so image fills nicely */
+      height: 500px;
       box-shadow: 0 0 15px rgba(0,0,0,0.1);
       background: white;
     }
+
     .image-wrapper {
       flex: 1 1 40%;
     }
+
     .hotel-image {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
     }
+
     .details-card {
       flex: 1 1 60%;
       padding: 30px;
-      border-radius: 0 8px 8px 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
     }
+
     .btn-primary {
       width: 150px;
-
     }
   </style>
 </head>
-
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-  <div class="container-fluid">
-    <!-- Brand -->
-    <a class="navbar-brand gradient-text" href="#">Travelly</a>
-
-    <!-- Toggle button for mobile -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
-            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" 
-            aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <!-- Navbar content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <!-- Left nav links -->
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/dashboard">Homepage</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/add-booking">Book a Hotel</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/">Edit Profile</a>
-        </li>
-      </ul>
-
-      <!-- Centered search bar -->
-      <form class="d-flex mx-auto" style="width: 40%;" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
-    </div>
-  </div>
-</nav>
-
-
-  <div class="container mt-5">
-    <h1 class="mb-4">Book a Hotel</h1>
-
-    <% if (messages && messages.length> 0) { %>
-      <div class="alert alert-danger">
-        <% messages.forEach(msg=> { %>
-          <p>
-            <%= msg %>
-          </p>
-          <% }); %>
-      </div>
-      <% } %>
-
-        <form action="/add-booking" method="POST">
-          <div class="mb-3">
-            <label for="bookingId" class="form-label">Select Hotel</label>
-            <select class="form-control" id="bookingId" name="bookingId" required>
-              <option value="">-- Select --</option>
-              <% hotels.forEach(hotel=> { %>
-                <option value="<%= hotel.bookingId %>">
-                  <%= hotel.name %> - <%= hotel.location %> (<%= hotel.roomType %>)
-                </option>
-                <% }) %>
-            </select>
-          </div>
-
-          <div class="mb-3">
-            <label for="checkIn" class="form-label">Check-In Date</label>
-            <input type="date" class="form-control" id="checkIn" name="checkIn" required>
-          </div>
-
-          <div class="mb-3">
-            <label for="checkOut" class="form-label">Check-Out Date</label>
-            <input type="date" class="form-control" id="checkOut" name="checkOut" required>
-          </div>
-
-          <a href="/dashboard" class="btn btn-secondary">Cancel</a>
-          <button type="submit" class="btn btn-primary">Book Now</button>
-        </form>
-  </div>
-
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
     <div class="container-fluid">
       <a class="navbar-brand gradient-text" href="#">Travelly</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
-              data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" 
-              aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
         <span class="navbar-toggler-icon"></span>
       </button>
+
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/dashboard">Homepage</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/">Edit Profile</a>
-          </li>
+          <li class="nav-item"><a class="nav-link active" href="/dashboard">Homepage</a></li>
+          <li class="nav-item"><a class="nav-link" href="/add-booking">Book a Hotel</a></li>
+          <li class="nav-item"><a class="nav-link" href="/">Edit Profile</a></li>
         </ul>
         <form class="d-flex mx-auto" style="width: 40%;" role="search">
           <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
           <button class="btn btn-outline-success" type="submit">Search</button>
         </form>
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="btn btn-secondary" href="/logout">Logout</a>
-          </li>
-        </ul>
       </div>
     </div>
   </nav>
+
+  <div class="container mt-5">
+    <h1 class="mb-4">Book a Hotel</h1>
+
+    <% if (messages && messages.length > 0) { %>
+      <div class="alert alert-danger">
+        <% messages.forEach(msg => { %>
+          <p><%= msg %></p>
+        <% }) %>
+      </div>
+    <% } %>
 
   <div class="container-flex">
     <div class="image-wrapper">
       <% if (selectedHotel) { %>
         <img src="<%= selectedHotel.image %>" alt="<%= selectedHotel.name %>" class="hotel-image" />
       <% } else { %>
-        <p>No hotel image available.</p>
+        <p class="p-3">No hotel image available.</p>
       <% } %>
     </div>
 
@@ -191,5 +116,4 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

@@ -1,53 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Edit Profile</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    .gradient-text {
+      background: linear-gradient(to right, #ff6f00, #ff9100);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .btn-secondary {
+      background: #343a40;
+      border: none;
+    }
+  </style>
 </head>
+
 <body>
+
+  <!--navbar-->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container-fluid">
+      <a class="navbar-brand gradient-text" href="#">Travelly</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/admin">Hotels Available</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/add">Add Hotel</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/edit-users">Edit User</a>
+          </li>
+        </ul>
+        <!-- Centered search bar  edited by nash
+        <form class="d-flex mx-auto" style="width: 40%;" action="/admin/search" method="GET">
+          <input class="form-control me-2" type="search" name="keyword" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form> -->
+        <!-- Right-aligned logout button -->
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="btn btn-secondary" href="/logout">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!--navbar -->
   <div class="container mt-5">
     <h1>Edit Profile</h1>
 
-    <% if (messages && messages.length > 0) { %>
+    <% if (messages && messages.length> 0) { %>
       <div class="alert alert-danger">
         <% messages.forEach(function(message) { %>
-          <p><%= message %></p>
-        <% }); %>
+          <p>
+            <%= message %>
+          </p>
+          <% }); %>
       </div>
-    <% } %>
+      <% } %>
 
-    <form action="/edit-profile" method="POST" class="mt-4">
-      <div class="mb-3">
-        <label for="username" class="form-label">Username:</label>
-        <input type="text" id="username" name="username" value="<%= formData.username %>" class="form-control" required />
-      </div>
+        <form action="/edit-profile" method="POST" class="mt-4">
+          <div class="mb-3">
+            <label for="username" class="form-label">Username:</label>
+            <input type="text" id="username" name="username" value="<%= formData.username %>" class="form-control"
+              required />
+          </div>
 
-      <div class="mb-3">
-        <label for="email" class="form-label">Email:</label>
-        <input type="email" id="email" name="email" value="<%= formData.email %>" class="form-control" required />
-      </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email:</label>
+            <input type="email" id="email" name="email" value="<%= formData.email %>" class="form-control" required />
+          </div>
 
-      <div class="mb-3">
-        <label for="address" class="form-label">Address:</label>
-        <input type="text" id="address" name="address" value="<%= formData.address %>" class="form-control" />
-      </div>
+          <div class="mb-3">
+            <label for="address" class="form-label">Address:</label>
+            <input type="text" id="address" name="address" value="<%= formData.address %>" class="form-control" />
+          </div>
 
-      <div class="mb-3">
-        <label for="contact" class="form-label">Contact:</label>
-        <input type="text" id="contact" name="contact" value="<%= formData.contact %>" class="form-control" />
-      </div>
+          <div class="mb-3">
+            <label for="contact" class="form-label">Contact:</label>
+            <input type="text" id="contact" name="contact" value="<%= formData.contact %>" class="form-control" />
+          </div>
 
-      
-    <div class="mb-3">
-        <label for="role" class="form-label">Role:</label>
-        <input type="text" id="role" name="role" value="<%= formData.role %>" class="form-control" disabled />
-    </div>
 
-     
+          <div class="mb-3">
+            <label for="role" class="form-label">Role:</label>
+            <input type="text" id="role" name="role" value="<%= formData.role %>" class="form-control" disabled />
+          </div>
 
-      <button type="submit" class="btn btn-primary">Update Profile</button>
-    </form>
+
+
+          <button type="submit" class="btn btn-primary">Update Profile</button>
+        </form>
   </div>
 </body>
+
 </html>

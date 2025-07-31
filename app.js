@@ -18,10 +18,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const connection = mysql.createConnection({
-    host: 'c237-all.mysql.database.azure.com',
+    host: '127.0.0.1',
     port: 3306,
-    user: 'c237admin',
-    password: 'c2372025!',
+    user: 'root',
+    password: 'Republic_C207',
     database: 'c237_ca2db_021_t3',
 });
 
@@ -114,7 +114,7 @@ app.get('/register', (req, res) => {
     res.render('register', {
         messages: req.flash('success'), // Green success alerts
         errors: req.flash('error'), // Red error alerts
-        formData: {},
+        formData: req.flash('formData')[0] || {},
     });
 });
 
@@ -342,7 +342,11 @@ app.get('/add-booking', checkAuthenticated, (req, res) => {
                 console.error(err);
                 return res.status(500).send('Error loading bookings');
             }
-            res.render('add-booking', { bookings, selectedHotel: null });
+            res.render('add-booking', {
+                hotels: bookings,
+                selectedHotel: null,
+                messages: req.flash('error') || []
+            });
         });
     } else {
         // Fetch selected hotel only
@@ -353,13 +357,19 @@ app.get('/add-booking', checkAuthenticated, (req, res) => {
                 return res.status(500).send('Error loading booking');
             }
             if (results.length === 0) {
-                return res.status(404).send('Hotel not found or not available');
+                req.flash('error', 'Hotel not found or not available');
+                return res.redirect('/add-booking');
             }
-            res.render('add-booking', { bookings: null, selectedHotel: results[0] });
+            res.render('add-booking', {
+                hotels: null,
+                selectedHotel: results[0],
+                messages: req.flash('error') || []
+            });
         });
     }
 });
 
+// POST /add-booking
 app.post('/add-booking', checkAuthenticated, (req, res) => {
     const bookingId = req.body.bookingId;
     const userId = req.session.user.id;
@@ -369,25 +379,26 @@ app.post('/add-booking', checkAuthenticated, (req, res) => {
     connection.query(updateQuery, [bookingId, userId], (err, result) => {
         if (err) {
             console.error('Error updating user booking:', err);
-            return res.status(500).send('Failed to book hotel.');
+            req.flash('error', 'Failed to book hotel.');
+            return res.redirect('/add-booking');
         }
 
-        res.redirect('/dashboard'); 
+        res.redirect('/dashboard');
     });
-});
 
 
-// King
-// Admin: View all users
-app.get('/admin/edit-users', checkAuthenticated, checkAdmin, (req, res) => {
-    const sql = 'SELECT * FROM users';
-    connection.query(sql, (err, users) => {
-        if (err) {
-            console.error('Error retrieving users:', err);
-            req.flash('error', 'Unable to fetch users.');
-            return res.redirect('/admin');
-        }
-        res.render('userList', { users, messages: req.flash('error') });
+    // King
+    // Admin: View all users
+    app.get('/admin/edit-users', checkAuthenticated, checkAdmin, (req, res) => {
+        const sql = 'SELECT * FROM users';
+        connection.query(sql, (err, users) => {
+            if (err) {
+                console.error('Error retrieving users:', err);
+                req.flash('error', 'Unable to fetch users.');
+                return res.redirect('/admin');
+            }
+            res.render('userList', { users, messages: req.flash('error') });
+        });
     });
 });
 
